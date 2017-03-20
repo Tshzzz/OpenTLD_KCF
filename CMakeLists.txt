@@ -28,9 +28,9 @@ cmake_minimum_required(VERSION 2.6)
 
 find_package(OpenCV REQUIRED)
 
-if(BUILD_QOPENTLD)
-    find_package(Qt4 REQUIRED)
-endif(BUILD_QOPENTLD)
+#if(BUILD_QOPENTLD)
+#    find_package(Qt4 REQUIRED)
+#endif(BUILD_QOPENTLD)
 
 #-------------------------------------------------------------------------------
 #version
@@ -82,7 +82,7 @@ add_subdirectory(src/3rdparty/cvblobs)
 if(NOT USE_SYSTEM_LIBS)
     add_subdirectory(src/3rdparty/libconfig)
 endif(NOT USE_SYSTEM_LIBS)
-add_subdirectory(src/3rdparty/kcf)
+#add_subdirectory(src/libopentld/kcf)
 #add_subdirectory(src/3rdparty/cf_tracking)
 add_subdirectory(src/libopentld)
 add_subdirectory(src/opentld)

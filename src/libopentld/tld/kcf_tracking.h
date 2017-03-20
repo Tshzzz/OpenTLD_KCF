@@ -28,8 +28,7 @@
 #define MEDIANFLOWTRACKER_H_
 
 #include <opencv/cv.h>
-
-#include "../../3rdparty/kcf/kcf.h"
+#include "../kcf/kcftracker.hpp"
 
 namespace tld
 {
@@ -42,7 +41,7 @@ public:
     virtual ~Tracker();
     void cleanPreviousData();
     void tracker_init(cv::Mat &org,cv::Rect *init_bb);
-    KCF_Tracker kcf;
+    KCFTracker kcf;
     void tracking(const cv::Mat &currImg);
     void update_pos(cv::Mat img, cv::Rect *init_bb);//void updateTrackerPosition();
 };
