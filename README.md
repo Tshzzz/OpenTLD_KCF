@@ -61,7 +61,6 @@ Look into the [sample-config-file](https://github.com/gnebehay/OpenTLD/blob/mast
 * OpenCV
 * CMake
 * libconfig++ (optional)
-* Qt4 (optional)
 
 ## Compiling
 ### CMake
