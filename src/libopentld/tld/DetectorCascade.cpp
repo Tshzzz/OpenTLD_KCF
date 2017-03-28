@@ -278,7 +278,8 @@ void DetectorCascade::detect(const Mat &img)
     {
         return;
     }
-
+    //cv::imshow("test0",img);
+    //cv::waitKey(0);
     //Prepare components
     foregroundDetector->nextIteration(img); //Calculates foreground
     varianceFilter->nextIteration(img); //Calculates integral images

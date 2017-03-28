@@ -41,6 +41,7 @@ class TLD
     void fuseHypotheses();
     void learn();
     void initialLearning();
+    bool startTracker;
 
 public:
     bool trackerEnabled;

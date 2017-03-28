@@ -25,7 +25,7 @@
 project(OpenTLD_KCF)
 
 cmake_minimum_required(VERSION 2.6)
-
+set(OpenCV_DIR /usr/local/share/OpenCV)
 find_package(OpenCV REQUIRED)
 
 #if(BUILD_QOPENTLD)
@@ -66,8 +66,9 @@ endif(WIN32)
 if(APPLE)
 	add_definitions(-DHAVE_XLOCALE_H)
 endif(APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic -O3 -Wno-long-long -fno-omit-frame-pointer -pthread")
+
 if(NOT MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic -O3 -Wno-long-long -fno-omit-frame-pointer -pthread -g")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif(NOT MSVC)
@@ -79,13 +80,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 #add subdirectories
 add_subdirectory(src/3rdparty/cvblobs)
 
-if(NOT USE_SYSTEM_LIBS)
-    add_subdirectory(src/3rdparty/libconfig)
-endif(NOT USE_SYSTEM_LIBS)
 #add_subdirectory(src/libopentld/kcf)
 #add_subdirectory(src/3rdparty/cf_tracking)
 add_subdirectory(src/libopentld)
-add_subdirectory(src/opentld)
+add_subdirectory(src/main)
 
 
 configure_file("${PROJECT_SOURCE_DIR}/OpenTLDConfig.cmake.in" "${PROJECT_BINARY_DIR}/OpenTLDConfig.cmake" @ONLY)

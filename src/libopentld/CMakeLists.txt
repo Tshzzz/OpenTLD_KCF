@@ -1,5 +1,5 @@
 
-include_directories(imacq
+include_directories(
     tld
     kcf
     ../3rdparty/cvblobs
@@ -7,7 +7,6 @@ include_directories(imacq
 link_directories(${OpenCV_LIB_DIR})
 
 add_library(libopentld
-    imacq/ImAcq.cpp
     kcf/fhog.cpp
     kcf/tracker.h
     kcf/kcftracker.cpp
@@ -22,7 +21,6 @@ add_library(libopentld
     tld/TLDUtil.cpp
     tld/VarianceFilter.cpp
 
-    imacq/ImAcq.h
     kcf/ffttools.hpp
     kcf/fhog.hpp
     kcf/labdata.hpp
@@ -40,10 +38,6 @@ add_library(libopentld
     tld/TLD.h
     tld/TLDUtil.h
     tld/VarianceFilter.h
-
-
-
-
 )
 
 target_link_libraries(libopentld ${OpenCV_LIBS})

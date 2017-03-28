@@ -27,10 +27,10 @@
 #define VARIANCEFILTER_H_
 
 #include <opencv/cv.h>
-
+#include <iostream>
 #include "IntegralImage.h"
 #include "DetectionResult.h"
-
+using namespace std;
 namespace tld
 {
 

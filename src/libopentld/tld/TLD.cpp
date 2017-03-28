@@ -39,7 +39,8 @@ namespace tld
 
 TLD::TLD()
 {
-    trackerEnabled = false;
+    startTracker = false;
+    trackerEnabled = true;
     detectorEnabled = true;
     learningEnabled = true;
     alternating = false;
@@ -139,7 +140,7 @@ void TLD::selectObject(const Mat &img, const Mat &rgb_img,Rect *bb)
     rgb_img.copyTo(kcf_img);
 
     kcf_tracker->tracker_init(kcf_img,bb);
-    trackerEnabled = true;
+    startTracker = true;
 
     if(currBB)
     {
@@ -162,12 +163,14 @@ void TLD::processImage(const Mat &img)
     cvtColor(img, grey_frame, CV_BGR2GRAY);
     currImg = grey_frame; // Store new image , right after storeCurrentData();
     //trackerEnabled = false;
-    if(trackerEnabled)
+    if(trackerEnabled && startTracker)
     {
         kcf_tracker->tracking(img);
     };
     if(detectorEnabled && (!alternating || kcf_tracker->trackerBB == NULL))
     {
+        //cv::imshow("gteste",grey_frame);
+        //cv::waitKey(0);
         detectorCascade->detect(grey_frame);
     }
 
