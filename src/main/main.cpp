@@ -1,10 +1,13 @@
 #include <opencv2/opencv.hpp>
-#include <TLD.h>
 #include <iostream>
+
+#include "imgStream.h"
+#include <TLD.h>
+
 using namespace std;
 using namespace cv;
 
-cv::Mat org,dst,img,tmp;
+cv::Mat org;//,tmp;
 cv::Rect init_Rect;
 int init_Finish;
 static void on_mouse(int event,int x,int y,int flags,void *ustc);
@@ -12,22 +15,22 @@ void configureTracker(tld::TLD *tracker,Mat grey);
 
 int main()
 {
-    VideoCapture capture(0);
+    imgStream *test = new imgStream();
     int seed;
     srand(seed);
     init_Finish = 0;
     namedWindow("img");
-    while(1)
+    while(test->getCurrImage() == 1)
     {
-        capture>>img;
-        img.copyTo(org);
-        org.copyTo(tmp);
+        //capture>>img;
+        test->currImage.copyTo(org);
         setMouseCallback("img",on_mouse,0);
         if(init_Finish == 1)
             break;
-        imshow("img",img);
-        waitKey(1);
+        imshow("img",org);
+        waitKey(10);
     }
+
 
     cv::Rect init_bbox = init_Rect;
     Mat grey(org.rows,org.cols, CV_8UC1);
@@ -37,9 +40,9 @@ int main()
     configureTracker(trackerTLD,grey);
     trackerTLD->selectObject(grey,org,&init_bbox);
     cv::Mat image;
-    while (1)
+    while (test->getCurrImage() == 1)
     {
-        capture>>image;
+        test->currImage.copyTo(image);
         image.copyTo(org);
         double tic = cvGetTickCount();
         trackerTLD->processImage(image);
@@ -59,6 +62,7 @@ int main()
         }
     }
     delete trackerTLD;
+    delete test;
     return 0;
 }
 
@@ -99,25 +103,20 @@ static void on_mouse(int event,int x,int y,int flags,void *ustc)
 
     if (event == CV_EVENT_LBUTTONDOWN)
     {
-        org.copyTo(img);
         pre_pt = Point(x,y);
-        //imshow("img",img);
     }
     else if (event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON))
     {
-        img.copyTo(tmp);
         cur_pt = Point(x,y);
-        rectangle(tmp,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
-        imshow("img",tmp);
+        rectangle(org,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
+        imshow("img",org);
     }
     else if (event == CV_EVENT_LBUTTONUP)
     {
-        org.copyTo(img);
         sprintf(temp,"(%d,%d)",x,y);
         cur_pt = Point(x,y);
-        rectangle(img,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
-        imshow("img",img);
-        img.copyTo(tmp);
+        rectangle(org,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
+        imshow("img",org);
         int width = abs(pre_pt.x - cur_pt.x);
         int height = abs(pre_pt.y - cur_pt.y);
         if (width == 0 || height == 0)

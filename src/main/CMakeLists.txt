@@ -11,7 +11,10 @@ include_directories(main
 #-------------------------------------------------------------------------------
 # opentld
 add_executable(opentld
-    main.cpp)
+    imgStream.h
+    main.cpp
+    imgStream.cpp
+)
 
 target_link_libraries(opentld libopentld cvblobs ${OpenCV_LIBS})
 
