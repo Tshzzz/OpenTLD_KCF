@@ -3,6 +3,7 @@
 imgStream::imgStream()
 {
     method = IMACQ_CAM;
+
     initImageStream();
 }
 
@@ -15,10 +16,25 @@ imgStream::imgStream(int Method,string path)
 
 void imgStream::initImageStream()
 {
+    currFrame = 0;
     if(method == IMACQ_CAM)
+    {
         capture = new VideoCapture(0);
+        assert(capture.isOpened());
+        imgNum = 100000;
+    }
     if(method == IMACQ_VID)
+    {
         capture = new VideoCapture(imgPath);
+        assert(capture.isOpened());
+        imgNum = capture->get(CV_CAP_PROP_FRAME_COUNT);
+        //cout << "======"<<endl;
+        /*if(!capture.isOpened())
+        {
+            assert
+            cout<<"fail to open!"<<endl;
+        */
+    }
     if(method == IMACQ_IMGS)
     {
         capture == NULL;
@@ -44,11 +60,17 @@ int imgStream::getCurrImage()
 {
 
     if(method != IMACQ_IMGS)
-        capture->read(currImage);
+    {
+        if(currFrame < imgNum)
+            capture->read(currImage);
+        else
+            return -1;
+        currFrame++;
+    }
     else
     {
         if(imgName.empty() == true)
-            return 0;
+            return -1;
         string img_name = imgName.front();
         currImage = imread(img_name);
         imgName.pop();

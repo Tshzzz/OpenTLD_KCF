@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <queue>
+#include <assert.h>
 using namespace std;
 using namespace cv;
 enum ImgMethod
@@ -20,7 +21,8 @@ public:
     string imgPath;
     queue<string> imgName;
     Mat currImage;
-
+    int imgNum;
+    int currFrame;
     imgStream();
     imgStream(int Method,string path);
     ~imgStream();

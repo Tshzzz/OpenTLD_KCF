@@ -7,54 +7,82 @@
 using namespace std;
 using namespace cv;
 
-cv::Mat org;//,tmp;
-cv::Rect init_Rect;
-int init_Finish;
+cv::Mat imgDisplay,tmp;
+cv::Rect initRect;
+int initBreak;
 static void on_mouse(int event,int x,int y,int flags,void *ustc);
 void configureTracker(tld::TLD *tracker,Mat grey);
 
-int main()
+int main(int argc, char **argv)
 {
-    imgStream *test = new imgStream();
-    int seed;
-    srand(seed);
-    init_Finish = 0;
-    namedWindow("img");
-    while(test->getCurrImage() == 1)
+    imgStream *test;
+    int initWaitKey = 0;
+    if(argc != 3)
     {
-        //capture>>img;
-        test->currImage.copyTo(org);
-        setMouseCallback("img",on_mouse,0);
-        if(init_Finish == 1)
-            break;
-        imshow("img",org);
-        waitKey(10);
+        test = new imgStream();
+        initWaitKey = 20;
+    }
+    else
+    {
+        int method = IMACQ_CAM;
+        if(strcmp(argv[1], "-IMG") == 0)
+        {
+            method = IMACQ_IMGS;
+            initWaitKey = 0;
+        }
+        if(strcmp(argv[1], "-VID") == 0)
+        {
+            method = IMACQ_VID;
+            initWaitKey = 0;
+        }
+        if(strcmp(argv[1], "-CAM") == 0)
+        {
+            method = IMACQ_CAM;
+            initWaitKey = 20;
+        }
+        string imgPath(argv[2]);
+        test = new imgStream(method,imgPath);
+        cout <<imgPath<<endl;
     }
 
+    int seed = 0;
+    srand(seed);
+    initBreak = 0;
+    namedWindow("img");
+    setMouseCallback("img",on_mouse,0);
+    while(test->getCurrImage() == 1)
+    {
+        test->currImage.copyTo(imgDisplay);
+        test->currImage.copyTo(tmp);
+        if(initBreak == 1)
+            break;
+        imshow("img",tmp);
+        waitKey(initWaitKey);
+    }
 
-    cv::Rect init_bbox = init_Rect;
-    Mat grey(org.rows,org.cols, CV_8UC1);
-    cvtColor(org,grey,CV_BGR2GRAY);
+    Mat grey(imgDisplay.rows,imgDisplay.cols, CV_8UC1);
+    cvtColor(imgDisplay,grey,CV_BGR2GRAY);
 
     tld::TLD *trackerTLD = new tld::TLD();
     configureTracker(trackerTLD,grey);
-    trackerTLD->selectObject(grey,org,&init_bbox);
-    cv::Mat image;
+    trackerTLD->selectObject(grey,imgDisplay,&initRect);
+
+    cv::Mat imageCurr;
     while (test->getCurrImage() == 1)
     {
-        test->currImage.copyTo(image);
-        image.copyTo(org);
+        test->currImage.copyTo(imageCurr);
+        imageCurr.copyTo(imgDisplay);
         double tic = cvGetTickCount();
-        trackerTLD->processImage(image);
+        trackerTLD->processImage(imageCurr);
         double toc = (cvGetTickCount() - tic) / cvGetTickFrequency();
         toc = toc / 1000000;
         float fps = 1 / toc;
         ostringstream getString;
         getString <<"fps: "<<fps;
-        cv::putText(org,getString.str(),Point(20,30),FONT_HERSHEY_SIMPLEX,1,Scalar(0,0,255,255));
+        cv::putText(imgDisplay,getString.str(),Point(20,30),FONT_HERSHEY_SIMPLEX,1,Scalar(0,0,255,255));
         if(trackerTLD->currBB != NULL)
-            cv::rectangle(org,Rect(trackerTLD->currBB->x,trackerTLD->currBB->y,trackerTLD->currBB->width,trackerTLD->currBB->height),Scalar(0,255,0,255),4);
-        cv::imshow("img", org);
+            cv::rectangle(imgDisplay,Rect(trackerTLD->currBB->x,trackerTLD->currBB->y,trackerTLD->currBB->width,trackerTLD->currBB->height),Scalar(0,255,0,255),4);
+        cv::imshow("img", imgDisplay);
         char key = cv::waitKey(20);
         if (key == 'q')
         {
@@ -107,16 +135,17 @@ static void on_mouse(int event,int x,int y,int flags,void *ustc)
     }
     else if (event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON))
     {
+        tmp.copyTo(imgDisplay);
         cur_pt = Point(x,y);
-        rectangle(org,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
-        imshow("img",org);
+        rectangle(imgDisplay,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
+        imshow("img",imgDisplay);
     }
     else if (event == CV_EVENT_LBUTTONUP)
     {
         sprintf(temp,"(%d,%d)",x,y);
         cur_pt = Point(x,y);
-        rectangle(org,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
-        imshow("img",org);
+        rectangle(tmp,pre_pt,cur_pt,Scalar(0,255,0,0),2,8,0);
+        imshow("img",tmp);
         int width = abs(pre_pt.x - cur_pt.x);
         int height = abs(pre_pt.y - cur_pt.y);
         if (width == 0 || height == 0)
@@ -124,8 +153,8 @@ static void on_mouse(int event,int x,int y,int flags,void *ustc)
             printf("width == 0 || height == 0");
             return;
         }
-        init_Rect = Rect(min(cur_pt.x,pre_pt.x),min(cur_pt.y,pre_pt.y),width,height);
-        init_Finish = 1;
+        initRect = Rect(min(cur_pt.x,pre_pt.x),min(cur_pt.y,pre_pt.y),width,height);
+        initBreak = 1;
     }
-    waitKey(10);
+    waitKey(1);
 }
